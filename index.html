@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>SABAR DIGITAL - DEEP_SEA IA</title>
+    <style>
+        body { margin: 0; background: #050a0f; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; width: 100%; }
+        h1 { font-size: 3rem; letter-spacing: 5px; color: #00d2ff; text-shadow: 0 0 20px #00d2ff; }
+        button { padding: 15px 40px; background: rgba(0,210,255,0.1); border: 2px solid #00d2ff; color: #00d2ff; cursor: pointer; font-weight: bold; font-size: 1.2rem; transition: 0.3s; }
+        button:hover { background: #00d2ff; color: #050a0f; box-shadow: 0 0 30px #00d2ff; }
+    </style>
+</head>
+<body>
+    <div class="ui">
+        <h1>SABAR DIGITAL</h1>
+        <button onclick="startAudit()">LANCER L'AUDIT IA</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        
+        let geometry = new THREE.BufferGeometry();
+        let pos = new Float32Array(8000 * 3);
+        for(let i=0; i<8000*3; i++) pos[i] = (Math.random()-0.5)*15;
+        geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        let particles = new THREE.Points(geometry, new THREE.PointsMaterial({color: 0x00d2ff, size: 0.03}));
+        scene.add(particles);
+        camera.position.z = 7;
+
+        function animate() { 
+            requestAnimationFrame(animate); 
+            particles.rotation.y += 0.001; 
+            renderer.render(scene, camera); 
+        }
+        animate();
+
+        async function startAudit() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/audit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texte: "Analyse Sabar Digital" })
+                });
+                const data = await response.json();
+                particles.material.color.setHex(0x00ff88);
+                alert("RÉSULTAT IA : " + data.score_optimisation);
+            } catch (e) {
+                alert("ERREUR : Vérifiez que brain.py est lancé !");
+            }
+        }
+    </script>
+</body>
+</html>
