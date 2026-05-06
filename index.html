@@ -64,7 +64,7 @@
             const target = document.getElementById('target').value || "ANONYMOUS";
             consoleLog.innerHTML += "<br>> SCANNING " + target + "...";
             try {
-                const response = await fetch('https://votre-service-sabar.onrender.com/audit', {
+                const response = await fetch('https://sabar-empire-api.onrender.com/audit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ texte: target })
