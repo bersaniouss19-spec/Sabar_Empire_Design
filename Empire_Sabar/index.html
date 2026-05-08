@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sabar Digital - V3.0 DEEP_SEA</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .content { pointer-events: auto; }
+        .glass-ui { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .scanline { width: 100%; height: 2px; background: rgba(0, 255, 255, 0.05); position: absolute; animation: scan 4s linear infinite; z-index: 5; }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+    </style>
+</head>
+<body>
+    <div id="aquarium-container"></div>
+    <div class="overlay flex flex-col p-8">
+        <div class="scanline"></div>
+        <header class="flex justify-between items-start content">
+            <div class="glass-ui p-6 rounded-2xl border-l-4 border-blue-500">
+                <h1 class="text-3xl font-black text-white tracking-tighter uppercase italic">SABAR DIGITAL <span class="text-blue-400 text-xs">V3.0 DEEP_SEA</span></h1>
+                <p class="text-[10px] text-blue-300 font-mono tracking-[0.4em] mt-1 font-bold">CORE_AUDIT_INFRASTRUCTURE</p>
+            </div>
+        </header>
+
+        <main class="mt-auto grid grid-cols-1 md:grid-cols-3 gap-6 content">
+            <div class="glass-ui p-8 rounded-3xl col-span-2 border-l-2 border-blue-500">
+                <div class="flex justify-between mb-8">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-blue-400 italic">Audit Universel...</h2>
+                    <span class="text-4xl font-black text-white italic" id="score-val">--<span class="text-xs opacity-50">/100</span></span>
+                </div>
+                <div class="flex gap-4 mb-6">
+                    <input type="text" id="target" placeholder="URL CIBLE..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-mono text-blue-200 focus:outline-none focus:border-blue-500">
+                    <button onclick="runAudit()" class="bg-blue-600 hover:bg-blue-400 text-white font-black px-8 py-3 rounded-xl text-[10px] uppercase transition-all shadow-lg active:scale-95">Analyser</button>
+                </div>
+                <div id="console" class="h-24 overflow-y-auto font-mono text-[10px] text-blue-300/60 leading-tight">
+                    > INITIALIZING NEURAL SCAN...<br>> AQUARIUM_ENGINE_READY...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let scene, camera, renderer, particles;
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('aquarium-container').appendChild(renderer.domElement);
+            const geo = new THREE.BufferGeometry();
+            const pos = [];
+            for (let i = 0; i < 8000; i++) pos.push((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15);
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            particles = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x00d4ff, size: 0.02, transparent: true, opacity: 0.5 }));
+            scene.add(particles);
+            animate();
+        }
+        function animate() { requestAnimationFrame(animate); particles.rotation.y += 0.0006; renderer.render(scene, camera); }
+
+        async function runAudit() {
+            const consoleLog = document.getElementById('console');
+            const target = document.getElementById('target').value || "ANONYMOUS";
+            consoleLog.innerHTML += "<br>> SCANNING " + target + "...";
+            try {
+                const response = await fetch('/.netlify/functions/audit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texte: target })
+                });
+                const data = await response.json();
+                document.getElementById('score-val').innerHTML = data.score_optimisation + '<span class="text-xs opacity-50">/100</span>';
+                consoleLog.innerHTML += "<br>> [í´±] OPTIMISATION TERMINÃ‰E.";
+            } catch (e) {
+                consoleLog.innerHTML += "<br>> ERREUR : CONNEXION CLOUD INTERROMPUE.";
+            }
+        }
+        init3D();
+    </script>
+</body>
+</html>
