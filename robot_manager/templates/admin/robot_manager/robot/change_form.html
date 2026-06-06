@@ -1,0 +1,54 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div id="etoile-3d-container" style="width: 100%; height: 300px; background-color: #000; border: 2px solid #FFD700; display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+        <p style="color: gold; font-family: sans-serif;">Loading 3D Star...</p>
+    </div>
+
+    {{ block.super }}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const container = document.getElementById('etoile-3d-container');
+            if (!container) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.TetrahedronGeometry(1.5, 2);
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0xFFD700, 
+                wireframe: true, 
+                emissive: 0x554400 
+            });
+            const star = new THREE.Mesh(geometry, material);
+            scene.add(star);
+
+            const light = new THREE.PointLight(0xFFFFFF, 2, 100);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            camera.position.z = 4;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                star.rotation.x += 0.01;
+                star.rotation.y += 0.02;
+                renderer.render(scene, camera);
+            }
+            animate();
+        });
+    </script>
+{% endblock %}
